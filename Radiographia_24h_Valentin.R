@@ -4,7 +4,7 @@ library(ForestTools)
 library(raster)
 
 # Load a canopy height model
-myRadiographia <- raster("C:\\Users\\D Holiaka\\Desktop\\Radiographia\\Particles_24h.tif")
+myRadiographia <- raster("C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Particles_24h.tif")
 
 # Create raster histogram before filtration
 hist(myRadiographia,
@@ -14,7 +14,7 @@ hist(myRadiographia,
 
 
 # Type main working parameters ()
-working_name <- "24h_ver2"
+working_name <- "Particles_24h"
 dpi <- 508
 resize_pixels <- 10
 fon_level <- 2500
@@ -37,7 +37,7 @@ hist(r2,
 plot(r2)
 
 # Write a crown map raster file (IF NEED)
-writeRaster(r2, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\pre_planset_24h.tif", dataType = "INT2U")
+writeRaster(r2, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\pre_Particles_24h.tif", dataType = "INT2U")
 
 # Main parameters of raster layers
 mean(r2)
@@ -109,13 +109,13 @@ cat("Sr-90 activity concentration of sample ", sum(polygon$Activity_Bq)/sample_w
 library(rgdal)
 
 # Save a set of dominant tree tops
-writeOGR(ttops, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\detect_paticals", working_name, driver = "ESRI Shapefile")
+writeOGR(ttops, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\detect_paticals", working_name, driver = "ESRI Shapefile")
 
 # Save a set of tree crown polygons
-writeOGR(polygon, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\output_data", working_name, driver = "ESRI Shapefile")
+writeOGR(polygon, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\output_data", working_name, driver = "ESRI Shapefile")
 
 # Add a second data set in a new worksheet
-write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Desktop\\Radiographia\\exposition_24h_ver2.xlsx")
+write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Particles_24h.xlsx")
 
 
       

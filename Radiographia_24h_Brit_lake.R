@@ -4,7 +4,7 @@ library(ForestTools)
 library(raster)
 
 # Load a canopy height model
-myRadiographia <- raster("C:\\Users\\D Holiaka\\Desktop\\Radiographia\\Brit 2-2_24h_65405range.tif")
+myRadiographia <- raster("C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Brit 2-2_24h_65405range.tif")
 
 # Create raster histogram before filtration
 hist(myRadiographia,
@@ -36,7 +36,7 @@ hist(r2,
 plot(r2)
 
 # Write a crown map raster file (IMPORTANT ----IF NEED)
-writeRaster(r2, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\pre_Brit_24h.tif", dataType = "INT2U")
+writeRaster(r2, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\pre_Brit_24h.tif", dataType = "INT2U")
 
 # Main parameters of raster layers
 mean(r2)
@@ -93,7 +93,7 @@ polygon[["sum"]] <- as.numeric(as.character(ex_sum))
 polygon[["cor_sum"]] <- polygon[["sum"]]-(polygon[["crownArea"]]/resize_pixels^2 * fon_level)
 polygon[["Activity_Bq"]] <- 3.585E-12*polygon[["cor_sum"]]^2 + 0.0000641*polygon[["cor_sum"]] 
 # Describe statistic
-sp_summarise(polygon, variables = c("Area_cm2", "Main", "Median", "SD", "max", "sum", "cor_sum", "Activity_Bq", "F_activity_Bq"))
+sp_summarise(polygon, variables = c("Area_cm2", "Main", "Median", "SD", "max", "sum", "cor_sum", "Activity_Bq"))
 
 Pedicted_activity_Bq <- polygon$Activity_Bq
 h <- hist(Pedicted_activity_Bq, xlab="Sr-90 activity Bq")
@@ -109,13 +109,13 @@ cat("Sr-90 activity concentration of sample ", sum(polygon$Activity_Bq)/sample_w
 library(rgdal)
 
 # Save a set of dominant tree tops
-writeOGR(ttops, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\detect_paticals", working_name, driver = "ESRI Shapefile")
+writeOGR(ttops, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\detect_paticals", working_name, driver = "ESRI Shapefile")
 
 # Save a set of tree crown polygons
-writeOGR(polygon, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\output_data", working_name, driver = "ESRI Shapefile")
+writeOGR(polygon, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\output_data", working_name, driver = "ESRI Shapefile")
 
 # Add a second data set in a new worksheet
-write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Desktop\\Radiographia\\Brit_24h.xlsx")
+write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Brit_24h.xlsx")
 
 
       
