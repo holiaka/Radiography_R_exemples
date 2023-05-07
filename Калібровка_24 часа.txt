@@ -1,0 +1,148 @@
+# Attach the 'ForestTools' and 'raster' libraries
+> library("writexl")
+> library(ForestTools)
+> library(raster)
+> # Load a canopy height model
+> myRadiographia <- raster("C:\\Users\\D Holiaka\\Desktop\\Radiographia\\Particles_24h.tif")
+> # Type main working parameters ()
+> working_name <- "24h"
+> dpi <- 508
+> resize_pixels <- 10
+> fon_level <- 2500
+> detect_level_for_part <- 3500
+> focal_filter <- 9
+> max_local_filter <- 50
+> sample_weigth_g <- 4.5
+> r1 <- aggregate(myRadiographia, fact = resize_pixels)
+> r2 <- focal(r1, w=matrix(1/focal_filter^2, nrow=focal_filter,ncol=focal_filter)) 
+> # Preview
+> plot(r2)
+> # Write a crown map raster file (IF NEED)
+> writeRaster(r2, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\pre_ver.tif", dataType = "INT2U")
+Warning messages:
+1: In .datatype(...) : argument "datatype" misspelled as "dataType"
+2: In .gd_SetProject(object, ...) : NOT UPDATED FOR PROJ >= 6
+> # Main parameters of raster layers
+> mean(r2)
+class      : RasterLayer 
+dimensions : 424, 513, 217512  (nrow, ncol, ncell)
+resolution : 10, 10  (x, y)
+extent     : 0, 5130, 0, 4240  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      : layer 
+values     : 0, 63973.96  (min, max)
+
+> # Main statistic of raster layers
+> summary(r2)
+              layer
+Min.        0.00000
+1st Qu.    47.40988
+Median    129.78728
+3rd Qu.   378.34821
+Max.    63973.96420
+NA's     7432.00000
+> # Remove plot margins (optional)
+> par(mar = rep(0.5, 4))
+> # Plot CHM (extra optional arguments remove labels and tick marks from the plot)
+> plot(r2, xlab = "", ylab = "", xaxt='n', yaxt = 'n')
+> # Finding of local maximums
+> rf <- function (x){max_local_filter}
+> # Detection  of tree tops
+> ttops <- vwf(CHM = r2, winFun = rf, minHeight = detect_level_for_part)
+> # Add dominant treetops to the plot
+> plot(ttops, col = "blue", pch = 20, cex = 0.5, add = TRUE)
+> max_local_filter <- 20
+> # Finding of local maximums
+> rf <- function (x){max_local_filter}
+> # Detection  of tree tops
+> ttops <- vwf(CHM = r2, winFun = rf, minHeight = detect_level_for_part)
+> # Add dominant treetops to the plot
+> plot(ttops, col = "blue", pch = 20, cex = 0.5, add = TRUE)
+> # Get the mean treetop height
+> min(ttops$height)
+[1] 3989.259
+> mean(ttops$height)
+[1] 28637
+> max(ttops$height)
+[1] 63973.96
+> # Create crown map
+> # IMPOTANT minHeight
+> crowns <- mcws(treetops = ttops, CHM = r2, minHeight = fon_level, verbose = FALSE)
+> # Create polygons map
+> # IMPOTANT minHeight
+> polygon <- mcws(treetops = ttops, CHM = r2, format = "polygons", minHeight = fon_level, verbose = FALSE)
+> # Add polygons outlines to the plot
+> plot(polygon, border = "red", lwd = 1.5, add = TRUE)
+> # Compute average area
+> polygon[["Area_cm2"]] <- polygon[["crownArea"]] / dpi^2 * 6.4516
+> # Extract raster parameters
+> ex_main <- extract(r2, polygon, fun=mean)
+> ex_median <- extract(r2, polygon, fun=median)
+> ex_sd <- extract(r2, polygon, fun=sd)
+> ex_max <- extract(r2, polygon, fun=max)
+> ex_sum <- extract(r2, polygon, fun=sum)
+> polygon[["Main"]] <- as.numeric(as.character(ex_main))
+> polygon[["Median"]] <- as.numeric(as.character(ex_median))
+> polygon[["SD"]] <- as.numeric(as.character(ex_sd))
+> polygon[["max"]] <- as.numeric(as.character(ex_max))
+> polygon[["sum"]] <- as.numeric(as.character(ex_sum))
+> polygon[["Activity_Bq"]] <- 2.339E-12*polygon[["sum"]]^2 + 0.0000488*polygon[["sum"]]
+> # Describe statistic
+> sp_summarise(polygon, variables = c("Area_cm2", "Main", "Median", "SD", "max", "sum", "Activity_Bq"))
+                         Value
+TreeCount         3.400000e+01
+Area_cm2Mean      8.980147e-01
+Area_cm2Median    7.262500e-01
+Area_cm2SD        6.973858e-01
+Area_cm2Min       1.600000e-01
+Area_cm2Max       3.255000e+00
+MainMean          9.903755e+03
+MainMedian        1.042392e+04
+MainSD            2.255566e+03
+MainMin           3.446234e+03
+MainMax           1.344136e+04
+MedianMean        7.114606e+03
+MedianMedian      7.459771e+03
+MedianSD          1.374161e+03
+MedianMin         3.456356e+03
+MedianMax         9.787531e+03
+SDMean            7.366807e+03
+SDMedian          7.699953e+03
+SDSD              3.127437e+03
+SDMin             3.504362e+02
+SDMax             1.366967e+04
+maxMean           2.863700e+04
+maxMedian         2.811936e+04
+maxSD             1.357084e+04
+maxMin            3.989259e+03
+maxMax            6.397396e+04
+sumMean           3.865070e+06
+sumMedian         3.049501e+06
+sumSD             3.430172e+06
+sumMin            2.250828e+05
+sumMax            1.510328e+07
+Activity_BqMean   2.502686e+02
+Activity_BqMedian 1.705705e+02
+Activity_BqSD     2.901527e+02
+Activity_BqMin    1.110254e+01
+Activity_BqMax    1.270588e+03
+> Pedicted_activity_Bq <- polygon$Activity_Bq
+> h <- hist(Pedicted_activity_Bq, xlab="Sr-90 activity Bq")
+> text(h$mids,h$counts,labels=h$counts, adj=c(0.5, -0.5))
+> # Total activity in Bq
+> cat("Total activity, Bq: ", sum(polygon$Activity_Bq))
+Total activity, Bq:  8509.132
+> # Sr-90 activity concentration of sample
+> cat("Sr-90 activity concentration of sample ", sum(polygon$Activity_Bq)/sample_weigth_g*1000, "Bq/kg")
+Sr-90 activity concentration of sample  1890918 Bq/kg
+> library(rgdal)
+> # Save a set of dominant tree tops
+> writeOGR(ttops, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\detect_paticals", working_name, driver = "ESRI Shapefile")
+> # Save a set of tree crown polygons
+> writeOGR(polygon, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\output_data", working_name, driver = "ESRI Shapefile")
+Warning message:
+In writeOGR(polygon, "C:\\Users\\D Holiaka\\Desktop\\Radiographia\\output_data",  :
+  Field names abbreviated for ESRI Shapefile driver
+> # Add a second data set in a new worksheet
+> write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Desktop\\Radiographia\\exposition_24h.xlsx")
