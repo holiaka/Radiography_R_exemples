@@ -4,7 +4,7 @@ library(ForestTools)
 library(raster)
 
 # Load a canopy height model
-myRadiographia <- raster("C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Particles_1h.tif")
+myRadiographia <- raster("C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Particles_96h.tif")
 
 # Create raster histogram before filtration
 hist(myRadiographia,
@@ -12,16 +12,15 @@ hist(myRadiographia,
      xlab = "Values", ylab = "Frequency",
      col = "springgreen")
 
-
 # Type main working parameters (IMPOTANT)
-time <- 1                        # Select exposition period in hours (0.5, 1, 7.5, 16, 21, 24, 48, 72, 96)
-working_name <- "Particles_1h"
+time <- 96                        # Select exposition period in hours (0.5, 1, 7.5, 16, 21, 24, 48, 72, 96)
+working_name <- "Particles_96h"
 dpi <- 508
 resize_pixels <- 10
-fon_level <- 117
-detect_level_for_part <- 200
-focal_filter <- 9
-max_local_filter <- 20
+fon_level <- 8000
+detect_level_for_part <- 9000
+focal_filter <- 11
+max_local_filter <- 40
 sample_weigth_g <- 4.5
 
 # Prepocessing
@@ -65,8 +64,9 @@ if (time==0.5) {
    a1 <- 0.0000356
    print ("Ok! You selected 96 hours")
 } else {
-   print ("ERROR!!! You typed no corectly values")
+      print ("ERROR!!! You typed no corectly values")
 }
+
 
 r1 <- aggregate(myRadiographia, fact = resize_pixels)
 
@@ -82,7 +82,7 @@ hist(r2,
 plot(r2)
 
 # Write a crown map raster file (IF NEED)
-writeRaster(r2, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\pre_Particles_1h.tif", dataType = "INT2U")
+writeRaster(r2, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\pre_Particles_96h.tif", dataType = "INT2U")
 
 # Main parameters of raster layers
 mean(r2)
@@ -160,7 +160,7 @@ writeOGR(ttops, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples
 writeOGR(polygon, "C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\output_data", working_name, driver = "ESRI Shapefile")
 
 # Add a second data set in a new worksheet
-write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Particles_1h.xlsx")
+write_xlsx(polygon@data,"C:\\Users\\D Holiaka\\Documents\\GitHub\\Radiography_R_exemples\\Particles_96h.xlsx")
 
 
       

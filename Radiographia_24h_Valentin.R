@@ -12,8 +12,8 @@ hist(myRadiographia,
      xlab = "Values)", ylab = "Frequency",
      col = "springgreen")
 
-
-# Type main working parameters ()
+# Type main working parameters (IMPOTANT)
+time <- 24                        # Select exposition period in hours (0.5, 1, 7.5, 16, 21, 24, 48, 72, 96)
 working_name <- "Particles_24h"
 dpi <- 508
 resize_pixels <- 10
@@ -22,6 +22,50 @@ detect_level_for_part <- 3500
 focal_filter <- 9
 max_local_filter <- 20
 sample_weigth_g <- 4.5
+
+# Prepocessing
+a0 <- -1
+a1 <- -1
+
+if (time==0.5) {
+   a0 <- -2.454E-09
+   a1 <- 0.00398
+   print ("Ok! You selected 30 minutes")
+} else if (time==1) {
+   a0 <- -2.786E-11
+   a1 <- 0.000842
+   print ("Ok! You selected 1 hour")
+} else if (time==7.5) {
+   a0 <- 1.262E-11
+   a1 <- 0.00013
+   print ("Ok! You selected 7 hours 30 minutes")
+} else if (time==16) {
+   a0 <- 5.706E-12
+   a1 <- 0.000077
+   print ("Ok! You selected 16 hours")
+} else if (time==21) {
+   a0 <- 4.215E-12
+   a1 <- 0.0000647
+   print ("Ok! You selected 21 hours")
+} else if (time==24) {
+   a0 <- 3.585E-12
+   a1 <- 0.0000641
+   print ("Ok! You selected 24 hours")
+} else if (time==48) {
+   a0 <- 1.401E-12
+   a1 <- 0.0000424
+   print ("Ok! You selected 48 hours")
+} else if (time==72) {
+   a0 <- 8.93E-13
+   a1 <- 0.0000364
+   print ("Ok! You selected 72 hours")
+} else if (time==96) {
+   a0 <- 4.94E-13
+   a1 <- 0.0000356
+   print ("Ok! You selected 96 hours")
+} else {
+   print ("ERROR!!! You typed no corectly values")
+}
 
 r1 <- aggregate(myRadiographia, fact = resize_pixels)
 
@@ -91,7 +135,7 @@ polygon[["SD"]] <- as.numeric(as.character(ex_sd))
 polygon[["max"]] <- as.numeric(as.character(ex_max))
 polygon[["sum"]] <- as.numeric(as.character(ex_sum))
 polygon[["cor_sum"]] <- polygon[["sum"]]-(polygon[["crownArea"]]/resize_pixels^2 * fon_level)
-polygon[["Activity_Bq"]] <- 3.585E-12*polygon[["cor_sum"]]^2 + 0.0000641*polygon[["cor_sum"]]
+polygon[["Activity_Bq"]] <- a0*polygon[["cor_sum"]]^2 + a1*polygon[["cor_sum"]]
    
 # Describe statistic
 sp_summarise(polygon, variables = c("Area_cm2", "Main", "Median", "SD", "max", "sum", "cor_sum", "Activity_Bq"))
